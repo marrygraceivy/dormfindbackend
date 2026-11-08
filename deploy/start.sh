@@ -31,7 +31,7 @@ sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${app_port}>/" \
 if [ -n "${DB_SSL_CA_PEM:-}" ]; then
   mkdir -p /etc/dormfind
   printf '%s\n' "$DB_SSL_CA_PEM" > /etc/dormfind/ca.pem
-  chmod 600 /etc/dormfind/ca.pem
+  chmod 644 /etc/dormfind/ca.pem
   export DB_SSL_CA=/etc/dormfind/ca.pem
 fi
 
@@ -48,3 +48,4 @@ apache2ctl configtest
 
 # Start Apache
 exec apache2-foreground
+
