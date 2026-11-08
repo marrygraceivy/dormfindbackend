@@ -15,7 +15,9 @@ class Dorm_security
         $secure = config_item('environment') === 'production';
         if (!session_start(['name' => 'dormfind_csrf', 'save_path' => $path,
             'use_strict_mode' => 1, 'use_only_cookies' => 1, 'cookie_httponly' => true,
-            'cookie_secure' => $secure, 'cookie_samesite' => 'Lax', 'gc_maxlifetime' => 1800])) {
+            'cookie_secure' => $secure,
+'cookie_samesite' => $secure ? 'None' : 'Lax',
+'gc_maxlifetime' => 1800])) {
             throw new RuntimeException('Security session could not be started.', 503);
         }
         if (empty($_SESSION['csrf']) || ($_SESSION['last_activity'] ?? 0) < time() - 1800) {
