@@ -17,16 +17,23 @@ if [ "$app_port" -lt 1024 ] || [ "$app_port" -gt 65535 ]; then
   exit 1
 fi
 
-# Ensure Apache uses only the prefork MPM
-# Required for the standard PHP Apache image
+# Ensure only Apache prefork MPM is enabled
 a2dismod -f mpm_event mpm_worker 2>/dev/null || true
 a2enmod mpm_prefork
 
-# Configure Apache to listen on Railway's PORT
+# Configure Apache port
 sed -i "s/^Listen .*/Listen ${app_port}/" /etc/apache2/ports.conf
 
 sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${app_port}>/" \
   /etc/apache2/sites-available/000-default.conf
+
+# Create Aiven MySQL CA certificate from Railway variable
+if [ -n "${DB_SSL_CA_PEM:-}" ]; then
+  mkdir -p /etc/dormfind
+  printf '%s\n' "$DB_SSL_CA_PEM" > /etc/dormfind/ca.pem
+  chmod 600 /etc/dormfind/ca.pem
+  export DB_SSL_CA=/etc/dormfind/ca.pem
+fi
 
 # Prepare writable runtime directories
 mkdir -p \
@@ -36,7 +43,7 @@ mkdir -p \
 
 chown -R www-data:www-data /var/www/html/runtime
 
-# Validate Apache configuration before starting
+# Validate Apache configuration
 apache2ctl configtest
 
 # Start Apache
