@@ -1,0 +1,17 @@
+/.env
+/.env.*
+!/.env.example
+/frontend/.env*
+!/frontend/.env.example
+/vendor/
+/runtime/cache/*
+/runtime/logs/*
+/runtime/session/*
+*.log
+/frontend/node_modules/
+/frontend/dist/
+/public/assets/
+/public/app.html
+/private/
+*.pem
+*service-account*.json

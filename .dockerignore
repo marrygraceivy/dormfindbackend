@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+!.env.example
+frontend/node_modules
+frontend/dist
+frontend/.env*
+private
+runtime
+php-error.log
+**/*.log
+tests
+*.pem
+*service-account*.json

@@ -1,0 +1,47 @@
+{
+ "rules": {
+  ".read": false, ".write": false,
+  "direct": {"$first": {"$second": {
+   ".read": "auth != null && (auth.uid == $first || auth.uid == $second)",
+   "messages": {
+    ".indexOn": ["createdAt"],
+    "$message": {
+     ".write": "auth != null && (auth.uid == $first || auth.uid == $second) && !data.exists() && newData.exists()",
+     ".validate": "newData.hasChildren(['sender', 'text', 'createdAt'])",
+     "sender": {".validate": "newData.isString() && newData.val() == auth.uid"},
+     "text": {".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"},
+     "createdAt": {".validate": "newData.isNumber() && newData.val() == now"},
+     "$other": {".validate": false}
+    }
+   },
+   "$other": {".validate": false}
+  }}},
+  "reads": {"$user": {
+   "$peer": {
+    ".read": "auth != null && (auth.uid == $user || auth.uid == $peer)",
+    ".write": "auth != null && auth.uid == $user",
+    ".validate": "newData.isNumber()"
+   }
+  }},
+  "delivered": {"$user": {"$peer": {
+   ".read": "auth != null && (auth.uid == $user || auth.uid == $peer)",
+   ".write": "auth != null && auth.uid == $user",
+   ".validate": "newData.isNumber()"
+  }}},
+  "presence": {"$user": {
+   ".read": "auth != null",
+   ".write": "auth != null && auth.uid == $user",
+   ".validate": "newData.hasChildren(['state', 'lastChanged'])",
+   "state": {".validate": "newData.isString() && (newData.val() == 'online' || newData.val() == 'offline')"},
+   "lastChanged": {".validate": "newData.isNumber()"},
+   "$other": {".validate": false}
+  }},
+  "typing": {"$first": {"$second": {
+   ".read": "auth != null && (auth.uid == $first || auth.uid == $second)",
+   "$user": {
+    ".write": "auth != null && auth.uid == $user && (auth.uid == $first || auth.uid == $second)",
+    ".validate": "newData.isBoolean()"
+   }
+  }}}
+ }
+}
