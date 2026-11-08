@@ -158,6 +158,13 @@ class Security_headers
         }
         header('X-Frame-Options: ' . $c['frame_options']);
         $this->common();
+
+        // Apply CORS to normal API requests
+        $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        if (preg_match('~(?:^|/)api(?:/|$)~', $requestPath)) {
+            $this->cors();
+        }
+
         return $this;
     }
 
